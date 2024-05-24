@@ -11,7 +11,7 @@ run:
 	./simv -l simv.log +ntb_random_seed_automatic
 
 compile:
-	vcs -l vcs.log -sverilog -debug_access+all -full64 $(SVTB) $(RTL) transaction.sv
+	vcs -l vcs.log -sverilog -debug_access+all -full64 $(SVTB) $(RTL) evaluation.sv transaction.sv
 
 dve:
 	dve -vpd vcdplus.vpd &
@@ -39,12 +39,4 @@ help:
 	@echo  " compile    => Compile the TB and DUT.                                 "
 	@echo  " run        => Run the simulation.                                     "
 	@echo  " dve        => Run dve in post-processing mode                         "
-	@echo  " debug      => Runs simulation interactively with dve                  "
-	@echo  " clean      => Remove all intermediate simv and log files.             "
-	@echo  "                                                                       "
-	@echo  " -------------------- ADMINISTRATIVE TARGETS ------------------------- "
-	@echo  " help       => Displays this message.                                  "
-	@echo  " solution   => Copies all files from solutions directory               "
-	@echo  " nuke       => Erase all changes. Put all files back to original state "
-	@echo  "								       "
-	@echo ==========================================================================
+	@echo  " debug      => Runs simulation interact
