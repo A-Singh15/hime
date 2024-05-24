@@ -1,3 +1,6 @@
+`ifndef TRANSACTION_COVERAGE_SV
+`define TRANSACTION_COVERAGE_SV
+
 `timescale 1ns/1ps
 
 `define SMEM_MAX 1024
@@ -97,3 +100,5 @@ class CoverageAnalysis;
   endtask
 
 endclass
+
+`endif // TRANSACTION_COVERAGE_SV
