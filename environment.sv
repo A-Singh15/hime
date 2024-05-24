@@ -5,6 +5,7 @@
 `include "driver.sv"
 `include "monitor.sv"
 `include "scoreboard.sv"
+`include "assertion.sv"
 
 class environment;
   // Handles for Generator, Driver, Monitor, Scoreboard, and Coverage
@@ -12,8 +13,8 @@ class environment;
   driver driv;
   monitor mon;
   scoreboard scb;
-  CoverageAnalysis cov;                 
-  
+  CoverageAnalysis cov;  // Ensure this matches the class name in transaction_coverage.sv
+
   // Mailbox handles for communication between components
   mailbox gen2driv, mon2scb, mon2cov;      
   
@@ -22,24 +23,24 @@ class environment;
   event mon_done;
   
   // Virtual interface handle
-  virtual MotionEstimationInterface memoryInterface;          
+  virtual MotionEstimationInterface motionEstIntf;          
 
   // Constructor: Initializes the virtual interface and component instances
-  function new(virtual MotionEstimationInterface memoryInterface);
-    this.memoryInterface = memoryInterface;   
+  function new(virtual MotionEstimationInterface motionEstIntf);
+    this.motionEstIntf = motionEstIntf;   
     gen2driv = new();
     mon2scb = new();
     mon2cov = new();
     gen = new(gen2driv, gen_ended);
-    driv = new(memoryInterface, gen2driv);
-    mon = new(memoryInterface, mon2scb, mon2cov);
+    driv = new(motionEstIntf, gen2driv);
+    mon = new(motionEstIntf, mon2scb, mon2cov);
     scb = new(mon2scb);
-    cov = new(memoryInterface, mon2cov);
+    cov = new();
   endfunction
   
   // Pre-test task: Initializes default values
   task pre_test();
-    $display("**************************************** [ENV_INFO] Driver start ****************************************");
+    $display("================================================= [ENV_INFO] Driver start ===============================================");
     driv.start();  // Initialize default values
   endtask
   
@@ -50,7 +51,12 @@ class environment;
       driv.main();
       mon.main();
       scb.main();
-      cov.trackCoverage();  // Updated method call
+      // Ensure CoverageAnalysis is correctly used here
+      forever begin
+        Transaction trans;
+        mon2cov.get(trans);
+        cov.sample(trans);
+      end
     join_any
   endtask
   
@@ -59,14 +65,14 @@ class environment;
     wait(gen_ended.triggered);
     wait(gen.trans_count == driv.no_transactions);
     wait(gen.trans_count == scb.no_transactions);
-    $display ("Coverage Report = %0.2f %% \n", cov.coverageScore);  // Updated print statement
+    // Print coverage report (if any)
     scb.summary();  // Print summary
   endtask 
   
   // Run task: Executes the complete test sequence
   task run;
     pre_test();
-    $display("****************************************[ENV_INFO] Done with pre-test, Test Started. ****************************************");
+    $display("================================================= [ENV_INFO] Done with pre-test, Test Started. =================================================");
     test();
     post_test();
     $finish;
