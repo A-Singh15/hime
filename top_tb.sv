@@ -3,6 +3,8 @@
 `include "evaluation.sv"
 `include "interface.sv"
 `include "test.sv"
+`include "assertion.sv"
+
 
 module top_tb();
   bit clk;
