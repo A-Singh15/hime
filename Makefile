@@ -3,7 +3,7 @@
 RTL = ./top.v
 SVTB = ./top_tb.sv
 SEED = $random
-SRCS = ./driver.sv ./environment.sv ./generator.sv ./interface.sv ./monitor.sv ./scoreboard.sv ./test.sv ./top_tb_direct.sv ./transaction.sv ./evaluation.sv
+SRCS = ./driver.sv ./environment.sv ./generator.sv ./interface.sv ./monitor.sv ./scoreboard.sv ./test.sv ./top_tb_direct.sv ./transaction.sv ./assertion.sv ./coverage.sv ./defines.sv
 
 default: test 
 
