@@ -1,5 +1,4 @@
 `timescale 1ns/1ps
-`include "transaction.sv"
 
 // ======== DEFINES ========
 `define SMEM_MAX 1024
@@ -103,8 +102,8 @@ class Coverage;
             bins zeroValue  = {0};             // Zero value
             bins positiveValues[] = {[1:7]};   // Positive values
         }
-        crossExpected: cross expectedXMotionCoverpoint, expectedYMotionCoverpoint;
-        crossActual: cross actualXMotionCoverpoint, actualYMotionCoverpoint;
+        CrossExpected : cross expectedXMotionCoverpoint, expectedYMotionCoverpoint;
+        CrossActual : cross actualXMotionCoverpoint, actualYMotionCoverpoint;
     endgroup
     
     // Constructor to initialize the coverage class
@@ -122,4 +121,5 @@ class Coverage;
             coverageMetric = coverageGroup.get_coverage(); // Update coverage metric
         end
     endtask
+    
 endclass
