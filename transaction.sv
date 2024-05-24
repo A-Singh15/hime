@@ -1,5 +1,7 @@
 `timescale 1ns/1ps
 
+`include "evaluation.sv"  // Ensure evaluation.sv is included first
+
 class Transaction;
 
   // Memory arrays for reference and search data
