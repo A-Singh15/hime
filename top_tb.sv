@@ -1,9 +1,8 @@
 `timescale 1ns/10ps
 
-`include "defines.sv"
+`include "evaluation.sv"
 `include "interface.sv"
 `include "test.sv"
-`include "assertion.sv"
 
 module top_tb();
   bit clk;
