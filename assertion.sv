@@ -1,3 +1,4 @@
+`ifndef ASSERTION_SV
 `timescale 1ns/1ps
 
 module MotionEstimationAssertions(
@@ -38,3 +39,4 @@ module MotionEstimationAssertions(
   end
 
 endmodule
+`endif // ASSERTION_SV
