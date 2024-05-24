@@ -84,8 +84,7 @@ endclass
 class CoverageAnalysis;
   // Coverage analysis class
 
-  // Example:
-  covergroup cg;
+  covergroup cg with function (Transaction transactionData);
     coverpoint transactionData.bestDistance;
     coverpoint transactionData.expectedXMotion;
     coverpoint transactionData.expectedYMotion;
@@ -96,7 +95,7 @@ class CoverageAnalysis;
   endfunction
 
   task sample(Transaction transactionData);
-    cg.sample();
+    cg.sample(transactionData);
   endtask
 
 endclass
