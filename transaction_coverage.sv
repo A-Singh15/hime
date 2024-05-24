@@ -1,16 +1,7 @@
 `timescale 1ns/1ps
 
-`ifndef TRANSACTION_COVERAGE_SV
-`define TRANSACTION_COVERAGE_SV
-
-// ======== DEFINES ========
-`define SMEM_MAX 1024
 `define RMEM_MAX 256
-`define TRANSACTION_COUNT 1
-`define DRIV_IF memIntf.DriverInterface
-`define MON_IF memIntf.MonitorInterface
-
-// ======== TRANSACTION ========
+`define SMEM_MAX 1024
 
 class Transaction;
 
@@ -84,76 +75,22 @@ class Transaction;
 
 endclass
 
-// ======== COVERAGE ========
+class CoverageAnalysis;
+  // Coverage analysis class
 
-class Coverage;
+  // Example:
+  covergroup cg;
+    coverpoint transactionData.bestDistance;
+    coverpoint transactionData.expectedXMotion;
+    coverpoint transactionData.expectedYMotion;
+  endgroup
 
-    // Coverage metric
-    real coverageMetric;
+  function new();
+    cg = new();
+  endfunction
 
-    // Virtual interface to memory
-    virtual MotionEstimationInterface memIntf;
+  task sample(Transaction transactionData);
+    cg.sample();
+  endtask
 
-    // Mailbox for receiving transactions from the monitor
-    mailbox mon2cov;
-
-    // Transaction object
-    Transaction transactionData;
-      
-    // Covergroup for measuring coverage
-    covergroup coverageGroup;
-        option.per_instance = 1;
-        
-        // Coverpoint for distance
-        distanceCoverpoint: coverpoint transactionData.bestDistance; // Automatic bins
-
-        // Coverpoint for expectedXMotion with specified bins
-        expectedXMotionCoverpoint: coverpoint transactionData.expectedXMotion {
-            bins negativeValues[] = {[-8:-1]}; // Negative values
-            bins zeroValue  = {0};             // Zero value
-            bins positiveValues[] = {[1:7]};   // Positive values
-        }
-
-        // Coverpoint for expectedYMotion with specified bins
-        expectedYMotionCoverpoint: coverpoint transactionData.expectedYMotion {
-            bins negativeValues[] = {[-8:-1]}; // Negative values
-            bins zeroValue  = {0};             // Zero value
-            bins positiveValues[] = {[1:7]};   // Positive values
-        }
-
-        // Coverpoint for actualXMotion with specified bins
-        actualXMotionCoverpoint: coverpoint transactionData.actualXMotion {
-            bins negativeValues[] = {[-8:-1]}; // Negative values
-            bins zeroValue  = {0};             // Zero value
-            bins positiveValues[] = {[1:7]};   // Positive values
-        }
-
-        // Coverpoint for actualYMotion with specified bins
-        actualYMotionCoverpoint: coverpoint transactionData.actualYMotion {
-            bins negativeValues[] = {[-8:-1]}; // Negative values
-            bins zeroValue  = {0};             // Zero value
-            bins positiveValues[] = {[1:7]};   // Positive values
-        }
-        CrossExpected : cross expectedXMotionCoverpoint, expectedYMotionCoverpoint;
-        CrossActual : cross actualXMotionCoverpoint, actualYMotionCoverpoint;
-    endgroup
-    
-    // Constructor to initialize the coverage class
-    function new(virtual MotionEstimationInterface memIntf, mailbox mon2cov);
-        this.memIntf = memIntf;
-        this.mon2cov = mon2cov;
-        coverageGroup = new();
-    endfunction
-     
-    // Task to continuously sample coverage
-    task sampleCoverage();
-        forever begin
-            mon2cov.get(transactionData);        // Get a transaction from the mailbox
-            coverageGroup.sample();              // Sample the covergroup
-            coverageMetric = coverageGroup.get_coverage(); // Update coverage metric
-        end
-    endtask
-    
 endclass
-
-`endif // TRANSACTION_COVERAGE_SV
