@@ -1,4 +1,4 @@
-# Makefile for SystemVerilog Lab1
+# Makefile for SystemVerilog Lab1 #+ntb_random_seed=$(SEED) 
 RTL= ./top.v
 SVTB = ./top_tb.sv
 SEED = $random
@@ -11,7 +11,7 @@ run:
 	./simv -l simv.log +ntb_random_seed_automatic
 
 compile:
-	vcs -l vcs.log -sverilog -debug_access+all -full64 $(SVTB) $(RTL) assertion.sv transaction_coverage.sv
+	vcs -l vcs.log -sverilog -debug_access+all -full64 $(SVTB) $(RTL)
 
 dve:
 	dve -vpd vcdplus.vpd &
