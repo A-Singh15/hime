@@ -5,7 +5,7 @@
 `include "driver.sv"
 `include "monitor.sv"
 `include "scoreboard.sv"
-`include "coverage.sv"
+`include "evaluation.sv"
 
 class environment;
   // Handles for Generator, Driver, Monitor, Scoreboard, and Coverage
