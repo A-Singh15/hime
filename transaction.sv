@@ -1,6 +1,9 @@
 `timescale 1ns/1ps
 
-`include "evaluation.sv"  // Ensure evaluation.sv is included first
+`ifndef TRANSACTION_SV
+`define TRANSACTION_SV
+
+`include "evaluation.sv"
 
 class Transaction;
 
@@ -73,3 +76,5 @@ class Transaction;
   endfunction
 
 endclass
+
+`endif // TRANSACTION_SV
