@@ -11,7 +11,7 @@ run:
 	./simv -l simv.log +ntb_random_seed_automatic
 
 compile:
-	vcs -l vcs.log -sverilog -debug_access+all -full64 $(SVTB) $(RTL) assertion.sv
+	vcs -l vcs.log -sverilog -debug_access+all -full64 $(SVTB) $(RTL) transaction_coverage.sv assertion.sv
 
 dve:
 	dve -vpd vcdplus.vpd &
