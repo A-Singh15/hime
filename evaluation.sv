@@ -1,5 +1,4 @@
 `timescale 1ns/1ps
-`include "transaction.sv"
 
 // ======== DEFINES ========
 `define SMEM_MAX 1024
