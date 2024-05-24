@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-`include "defines.sv"
+`include "transaction_coverage.sv"
 
 class driver;
 
