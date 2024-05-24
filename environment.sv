@@ -1,11 +1,11 @@
 `timescale 1ns/1ps
 
 `include "transaction_coverage.sv"
+`include "assertion.sv"
 `include "generator.sv"
 `include "driver.sv"
 `include "monitor.sv"
 `include "scoreboard.sv"
-`include "assertion.sv"
 
 class environment;
   // Handles for Generator, Driver, Monitor, Scoreboard, and Coverage
