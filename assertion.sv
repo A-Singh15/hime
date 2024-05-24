@@ -1,4 +1,5 @@
 `ifndef ASSERTION_SV
+`define ASSERTION_SV
 `timescale 1ns/1ps
 
 module MotionEstimationAssertions(
