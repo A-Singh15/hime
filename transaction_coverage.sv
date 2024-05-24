@@ -1,0 +1,159 @@
+`timescale 1ns/1ps
+
+`ifndef TRANSACTION_COVERAGE_SV
+`define TRANSACTION_COVERAGE_SV
+
+// ======== DEFINES ========
+`define SMEM_MAX 1024
+`define RMEM_MAX 256
+`define TRANSACTION_COUNT 1
+`define DRIV_IF memIntf.DriverInterface
+`define MON_IF memIntf.MonitorInterface
+
+// ======== TRANSACTION ========
+
+class Transaction;
+
+  // Memory arrays for reference and search data
+  logic [7:0] referenceMemory[`RMEM_MAX-1:0];
+  rand logic [7:0] searchMemory[`SMEM_MAX-1:0];
+
+  // Motion vectors and best distance metrics
+  rand integer expectedXMotion;
+  rand integer expectedYMotion;
+  integer actualXMotion;
+  integer actualYMotion;
+  logic [7:0] bestDistance;
+
+  // Random index for introducing mismatches
+  rand int randomMismatchIndex;
+  
+  // Constraints for expected motion vectors
+  constraint expectedMotionConstraint { 
+    expectedXMotion dist {[-8:0]:=10, [1:7]:=10};
+    expectedYMotion dist {[-8:0]:=10, [1:7]:=10};
+  };
+
+  // Constraints for mismatch index distribution
+  constraint mismatchIndexConstraint {
+    soft randomMismatchIndex dist {[0:255] := 10, [256:511] := 10, [512:767] := 10}; 
+  };
+
+  // Constraints for search memory values
+  constraint searchMemoryConstraint {
+    foreach(searchMemory[i]) searchMemory[i] inside {[0:`SMEM_MAX-1]};
+  };
+
+  // Display function to output transaction details
+  function void display();
+    $display(" ================================================= [TRANSACTION_INFO] :: Search Memory Generated =================================================");
+    for (int j = 0; j < `SMEM_MAX; j++) begin
+      if (j % 32 == 0) $display("  ");
+      $write("%h  ", searchMemory[j]);
+      if (j == 1023) $display("  ");
+    end
+
+    $display(" ================================================= [TRANSACTION_INFO] :: Reference Memory Generated =================================================");
+    for (int j = 0; j < `RMEM_MAX; j++) begin
+      if (j % 16 == 0) $display("  ");
+      $write("%h ", referenceMemory[j]);
+      if (j == 255) $display("  ");
+    end
+
+    $display("\n[TRANSACTION_INFO] :: Random Mismatch Index : %0d", randomMismatchIndex);     
+    $display("[TRANSACTION_INFO] :: Expected X Motion : %0d", expectedXMotion);
+    $display("[TRANSACTION_INFO] :: Expected Y Motion : %0d", expectedYMotion);
+  endfunction
+
+  // Function to generate reference memory based on search memory and motion vectors
+  function void generateReferenceMemory();
+    foreach (referenceMemory[i]) begin
+      // Generate a full match by default
+      referenceMemory[i] = searchMemory[32 * 8 + 8 + (((i / 16) + expectedYMotion) * 32) + ((i % 16) + expectedXMotion)];
+      
+      // Introduce a partial match at the random mismatch index
+      if (i == randomMismatchIndex)   
+        referenceMemory[i] = $urandom_range(0, 255);
+    end
+
+    // Shuffle referenceMemory to create no match if randomMismatchIndex is above a threshold
+    if (randomMismatchIndex >= 400) begin
+      referenceMemory.shuffle();
+    end
+  endfunction
+
+endclass
+
+// ======== COVERAGE ========
+
+class Coverage;
+
+    // Coverage metric
+    real coverageMetric;
+
+    // Virtual interface to memory
+    virtual MotionEstimationInterface memIntf;
+
+    // Mailbox for receiving transactions from the monitor
+    mailbox mon2cov;
+
+    // Transaction object
+    Transaction transactionData;
+      
+    // Covergroup for measuring coverage
+    covergroup coverageGroup;
+        option.per_instance = 1;
+        
+        // Coverpoint for distance
+        distanceCoverpoint: coverpoint transactionData.bestDistance; // Automatic bins
+
+        // Coverpoint for expectedXMotion with specified bins
+        expectedXMotionCoverpoint: coverpoint transactionData.expectedXMotion {
+            bins negativeValues[] = {[-8:-1]}; // Negative values
+            bins zeroValue  = {0};             // Zero value
+            bins positiveValues[] = {[1:7]};   // Positive values
+        }
+
+        // Coverpoint for expectedYMotion with specified bins
+        expectedYMotionCoverpoint: coverpoint transactionData.expectedYMotion {
+            bins negativeValues[] = {[-8:-1]}; // Negative values
+            bins zeroValue  = {0};             // Zero value
+            bins positiveValues[] = {[1:7]};   // Positive values
+        }
+
+        // Coverpoint for actualXMotion with specified bins
+        actualXMotionCoverpoint: coverpoint transactionData.actualXMotion {
+            bins negativeValues[] = {[-8:-1]}; // Negative values
+            bins zeroValue  = {0};             // Zero value
+            bins positiveValues[] = {[1:7]};   // Positive values
+        }
+
+        // Coverpoint for actualYMotion with specified bins
+        actualYMotionCoverpoint: coverpoint transactionData.actualYMotion {
+            bins negativeValues[] = {[-8:-1]}; // Negative values
+            bins zeroValue  = {0};             // Zero value
+            bins positiveValues[] = {[1:7]};   // Positive values
+        }
+        CrossExpected : cross expectedXMotionCoverpoint, expectedYMotionCoverpoint;
+        CrossActual : cross actualXMotionCoverpoint, actualYMotionCoverpoint;
+    endgroup
+    
+    // Constructor to initialize the coverage class
+    function new(virtual MotionEstimationInterface memIntf, mailbox mon2cov);
+        this.memIntf = memIntf;
+        this.mon2cov = mon2cov;
+        coverageGroup = new();
+    endfunction
+     
+    // Task to continuously sample coverage
+    task sampleCoverage();
+        forever begin
+            mon2cov.get(transactionData);        // Get a transaction from the mailbox
+            coverageGroup.sample();              // Sample the covergroup
+            coverageMetric = coverageGroup.get_coverage(); // Update coverage metric
+        end
+    endtask
+    
+endclass
+
+`endif // TRANSACTION_COVERAGE_SV
