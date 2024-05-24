@@ -85,9 +85,9 @@ class CoverageAnalysis;
   // Coverage analysis class
 
   covergroup cg @(posedge clk);
-    coverpoint bestDistance;
-    coverpoint expectedXMotion;
-    coverpoint expectedYMotion;
+    coverpoint transactionData.bestDistance;
+    coverpoint transactionData.expectedXMotion;
+    coverpoint transactionData.expectedYMotion;
   endgroup
 
   function new();
