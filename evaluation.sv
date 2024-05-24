@@ -1,3 +1,5 @@
+`ifndef EVALUATION_SV
+`define EVALUATION_SV
 `timescale 1ns/1ps
 `include "transaction.sv"
 
@@ -124,3 +126,5 @@ class Coverage;
     endtask
     
 endclass
+
+`endif // EVALUATION_SV
