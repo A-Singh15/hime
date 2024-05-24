@@ -43,11 +43,11 @@ module MotionEstimationAssertions (
         else $error("Assertion failed: (!trigger && !$past(trigger)) -> done at time %0t", $time);
 
         // Assertion 3: Ensure that 'distance' is always within the valid range of 0x00 to 0xFF
-        assert (disable iff (!trigger) ((distance >= 8'h00) && (distance <= 8'hFF)))
+        assert ((distance >= 8'h00) && (distance <= 8'hFF))
         else $error("Assertion failed: distance out of range at time %0t", $time);
 
         // Assertion 4: Ensure that 'vectorX' and 'vectorY' are valid motion vectors
-        assert (disable iff (!done || !trigger) ((signedX >= -8) && (signedX <= 7) && (signedY >= -8) && (signedY <= 7)))
+        assert ((signedX >= -8) && (signedX <= 7) && (signedY >= -8) && (signedY <= 7))
         else $error("Assertion failed at time %0t: MotionX = %0d, MotionY = %0d", $time, signedX, signedY);
     end
 endmodule
@@ -122,4 +122,3 @@ class Coverage;
         end
     endtask
 endclass
-
